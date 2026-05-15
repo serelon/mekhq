@@ -522,6 +522,7 @@ public class CampaignOptionsUnmarshaller {
             case "interestedInBothSexesDiceSize" ->
                   campaignOptions.setInterestedInBothSexesDiceSize(parseInt(nodeContents));
             case "logMarriageNameChanges" -> campaignOptions.setLogMarriageNameChanges(parseBoolean(nodeContents));
+            case "noNameChangeOnMarriage" -> campaignOptions.setNoNameChangeOnMarriage(parseBoolean(nodeContents));
             case "marriageSurnameWeights" -> {
                 if (!childNode.hasChildNodes()) {
                     return false;
