@@ -485,6 +485,14 @@ public class PartsReportDialog extends JDialog {
     }
 
     private void sellExcess() {
+        int confirm = JOptionPane.showConfirmDialog(this,
+              resourceMap.getString("sellExcessConfirm.text"),
+              resourceMap.getString("sellExcessConfirm.title"),
+              JOptionPane.YES_NO_OPTION);
+        if (confirm != JOptionPane.YES_OPTION) {
+            return;
+        }
+
         commitTableEdits();
         storePartInUseRequestedStockMap();
 
