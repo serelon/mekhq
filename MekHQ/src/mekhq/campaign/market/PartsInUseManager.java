@@ -35,6 +35,7 @@ package mekhq.campaign.market;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.isProhibitedUnitType;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -431,6 +432,60 @@ public class PartsInUseManager {
                 --toBuy;
             }
         }
+    }
+
+    /**
+     * Sells parts from the warehouse that exceed the given threshold above each part's requested stock level.
+     *
+     * <p>For each part in the provided set, calculates how many units are above the sell ceiling
+     * ({@code useCount * requestedStock% * threshold / 10000}) and sells the excess.</p>
+     *
+     * @param partsInUse the set of {@link PartInUse} instances to check
+     * @param threshold  sell anything above this percentage of the requested stock level (e.g., 200.0 = 2×)
+     *
+     * @return the number of distinct part types sold
+     */
+    public int sellExcessPartsInUse(Set<PartInUse> partsInUse, double threshold) {
+        int sold = 0;
+        for (PartInUse partInUse : partsInUse) {
+            int toSell = findSellExcessAmount(partInUse, threshold);
+            if (toSell <= 0) {
+                continue;
+            }
+            List<Part> spares = partInUse.getSpares();
+            int remaining = toSell;
+            for (Part spare : spares) {
+                if (remaining <= 0) {
+                    break;
+                }
+                if (spare.isPartUsedOrReserved()) {
+                    continue;
+                }
+                int spareQty = spare.getSellableQuantity();
+                if (spareQty <= 0) {
+                    continue;
+                }
+                if (spareQty >= remaining) {
+                    quartermaster.sellPart(spare, remaining);
+                    remaining = 0;
+                } else {
+                    quartermaster.sellPart(spare, spareQty);
+                    remaining -= spareQty;
+                }
+            }
+            if (remaining < toSell) {
+                sold++;
+            }
+        }
+        return sold;
+    }
+
+    private int findSellExcessAmount(PartInUse partInUse, double threshold) {
+        if (partInUse.getUseCount() <= 0) {
+            return 0;
+        }
+        int ceiling = (int) Math.floor(partInUse.getRequestedStock() / 100.0 * threshold / 100.0 * partInUse.getUseCount());
+        return Math.max(0, partInUse.getStoreCount() - ceiling);
     }
 
 
