@@ -2243,6 +2243,8 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 retVal.setIgnoreMothballed(Boolean.parseBoolean(wn2.getTextContent()));
             } else if (wn2.getNodeName().equalsIgnoreCase("topUpWeekly")) {
                 retVal.setTopUpWeekly(Boolean.parseBoolean(wn2.getTextContent()));
+            } else if (wn2.getNodeName().equalsIgnoreCase("sellExcessThreshold")) {
+                retVal.setSellExcessThreshold(Double.parseDouble(wn2.getTextContent()));
             } else if (wn2.getNodeName().equalsIgnoreCase("ignoreSparesUnderQuality")) {
                 PartQuality ignoreQuality = PartQuality.valueOf(wn2.getTextContent());
                 retVal.setIgnoreSparesUnderQuality(ignoreQuality);
