@@ -56,6 +56,7 @@ import megamek.common.ui.FastJScrollPane;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Quartermaster;
+import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.market.PartsInUseManager;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInUse;
@@ -496,9 +497,18 @@ public class PartsReportDialog extends JDialog {
         commitTableEdits();
         storePartInUseRequestedStockMap();
 
-        partsInUseManager.sellExcessPartsInUse(getPartsInUseFromTable(),
-              campaign.getSellExcessThreshold());
+        PartsInUseManager.SellSummary summary = partsInUseManager.sellExcessPartsInUse(
+              getPartsInUseFromTable(), campaign.getSellExcessThreshold());
         updateOverviewPartsInUse();
+
+        if (summary.typesSold() > 0) {
+            String message = summary.typesSold() + " part type(s) sold for "
+                  + summary.totalValue().toAmountAndSymbolString();
+            campaign.addReport(DailyReportType.FINANCES, message);
+            JOptionPane.showMessageDialog(this, message,
+                  resourceMap.getString("sellExcessResult.title"),
+                  JOptionPane.INFORMATION_MESSAGE);
+        }
     }
 
     public void storePartInUseRequestedStockMap() {
