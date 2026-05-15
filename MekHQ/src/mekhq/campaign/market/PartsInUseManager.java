@@ -458,6 +458,9 @@ public class PartsInUseManager {
                 if (remaining <= 0) {
                     break;
                 }
+                if (spare.isPartUsedOrReserved()) {
+                    continue;
+                }
                 int spareQty = spare.getSellableQuantity();
                 if (spareQty <= 0) {
                     continue;
@@ -478,6 +481,9 @@ public class PartsInUseManager {
     }
 
     private int findSellExcessAmount(PartInUse partInUse, double threshold) {
+        if (partInUse.getUseCount() <= 0) {
+            return 0;
+        }
         int ceiling = (int) Math.floor(partInUse.getRequestedStock() / 100.0 * threshold / 100.0 * partInUse.getUseCount());
         return Math.max(0, partInUse.getStoreCount() - ceiling);
     }
