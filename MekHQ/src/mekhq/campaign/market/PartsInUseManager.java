@@ -41,6 +41,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import megamek.common.equipment.EquipmentType;
+import mekhq.campaign.finances.Money;
 import megamek.common.equipment.MiscType;
 import megamek.common.equipment.WeaponType;
 import megamek.common.units.Entity;
@@ -95,6 +96,8 @@ public class PartsInUseManager {
     private final ShoppingList shoppingList;
     private final Quartermaster quartermaster;
     private final Map<String, Double> partsInUseRequestedStockMap;
+
+    public record SellSummary(int typesSold, Money totalValue) {}
 
     /**
      * Creates a new {@link PartsInUseManager} manager for the specified campaign.
@@ -443,10 +446,11 @@ public class PartsInUseManager {
      * @param partsInUse the set of {@link PartInUse} instances to check
      * @param threshold  sell anything above this percentage of the requested stock level (e.g., 200.0 = 2×)
      *
-     * @return the number of distinct part types sold
+     * @return a {@link SellSummary} with the count of distinct part types sold and the total sale value
      */
-    public int sellExcessPartsInUse(Set<PartInUse> partsInUse, double threshold) {
+    public SellSummary sellExcessPartsInUse(Set<PartInUse> partsInUse, double threshold) {
         int sold = 0;
+        Money totalValue = Money.zero();
         for (PartInUse partInUse : partsInUse) {
             int toSell = findSellExcessAmount(partInUse, threshold);
             if (toSell <= 0) {
@@ -466,9 +470,11 @@ public class PartsInUseManager {
                     continue;
                 }
                 if (spareQty >= remaining) {
+                    totalValue = totalValue.plus(spare.getActualValue().multipliedBy(remaining));
                     quartermaster.sellPart(spare, remaining);
                     remaining = 0;
                 } else {
+                    totalValue = totalValue.plus(spare.getActualValue().multipliedBy(spareQty));
                     quartermaster.sellPart(spare, spareQty);
                     remaining -= spareQty;
                 }
@@ -477,7 +483,7 @@ public class PartsInUseManager {
                 sold++;
             }
         }
-        return sold;
+        return new SellSummary(sold, totalValue);
     }
 
     private int findSellExcessAmount(PartInUse partInUse, double threshold) {
