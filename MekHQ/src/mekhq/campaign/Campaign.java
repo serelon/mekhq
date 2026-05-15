@@ -440,6 +440,7 @@ public class Campaign implements ITechManager, ILocation {
     // options relating to parts in use and restock
     private boolean ignoreMothballed;
     private boolean topUpWeekly;
+    private double sellExcessThreshold;
     private PartQuality ignoreSparesUnderQuality;
 
     // Libraries
@@ -606,6 +607,7 @@ public class Campaign implements ITechManager, ILocation {
         temporaryPrisonerCapacity = DEFAULT_TEMPORARY_CAPACITY;
         processProcurement = true;
         topUpWeekly = mekhqOptions.getNewDayAutoLogistics();
+        sellExcessThreshold = 200.0;
         ignoreMothballed = true;
         ignoreSparesUnderQuality = QUALITY_A;
 
@@ -8693,6 +8695,14 @@ public class Campaign implements ITechManager, ILocation {
         this.topUpWeekly = topUpWeekly;
     }
 
+    public double getSellExcessThreshold() {
+        return sellExcessThreshold;
+    }
+
+    public void setSellExcessThreshold(double sellExcessThreshold) {
+        this.sellExcessThreshold = sellExcessThreshold;
+    }
+
     public PartQuality getIgnoreSparesUnderQuality() {
         return ignoreSparesUnderQuality;
     }
@@ -8704,6 +8714,7 @@ public class Campaign implements ITechManager, ILocation {
     public void writePartInUseToXML(final PrintWriter pw, int indent) {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "ignoreMothBalled", ignoreMothballed);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "topUpWeekly", topUpWeekly);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sellExcessThreshold", sellExcessThreshold);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "ignoreSparesUnderQuality", ignoreSparesUnderQuality.name());
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "partInUseMap");
         writePartInUseMapToXML(pw, indent);
