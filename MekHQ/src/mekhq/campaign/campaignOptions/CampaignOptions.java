@@ -373,6 +373,7 @@ public class CampaignOptions {
     private boolean usePrisonerMarriages;
     private int checkMutualAncestorsDepth;
     private boolean logMarriageNameChanges;
+    private boolean noNameChangeOnMarriage;
     private Map<MergingSurnameStyle, Integer> marriageSurnameWeights;
     private RandomMarriageMethod randomMarriageMethod;
     private boolean useRandomClanPersonnelMarriages;
@@ -1027,6 +1028,7 @@ public class CampaignOptions {
         setInterestedInSameSexDiceSize(14);
         setInterestedInBothSexesDiceSize(33);
         setLogMarriageNameChanges(false);
+        setNoNameChangeOnMarriage(false);
         setMarriageSurnameWeights(new HashMap<>());
         getMarriageSurnameWeights().put(MergingSurnameStyle.NO_CHANGE, 100);
         getMarriageSurnameWeights().put(MergingSurnameStyle.YOURS, 55);
@@ -2896,6 +2898,20 @@ public class CampaignOptions {
      */
     public void setLogMarriageNameChanges(final boolean logMarriageNameChanges) {
         this.logMarriageNameChanges = logMarriageNameChanges;
+    }
+
+    /**
+     * @return whether women are prevented from changing their surname on marriage
+     */
+    public boolean isNoNameChangeOnMarriage() {
+        return noNameChangeOnMarriage;
+    }
+
+    /**
+     * @param noNameChangeOnMarriage whether to prevent women from changing their surname on marriage
+     */
+    public void setNoNameChangeOnMarriage(final boolean noNameChangeOnMarriage) {
+        this.noNameChangeOnMarriage = noNameChangeOnMarriage;
     }
 
     /**
