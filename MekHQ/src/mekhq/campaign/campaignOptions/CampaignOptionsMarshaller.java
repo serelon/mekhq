@@ -671,6 +671,10 @@ public class CampaignOptionsMarshaller {
               indent,
               "logMarriageNameChanges",
               campaignOptions.isLogMarriageNameChanges());
+        MHQXMLUtility.writeSimpleXMLTag(pw,
+              indent,
+              "noNameChangeOnMarriage",
+              campaignOptions.isNoNameChangeOnMarriage());
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "marriageSurnameWeights");
         for (final Entry<MergingSurnameStyle, Integer> entry : campaignOptions.getMarriageSurnameWeights().entrySet()) {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, entry.getKey().name(), entry.getValue());

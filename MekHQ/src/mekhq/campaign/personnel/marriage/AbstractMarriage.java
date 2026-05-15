@@ -249,6 +249,16 @@ public abstract class AbstractMarriage {
         // Apply the surname style changes
         surnameStyle.apply(campaign, today, origin, spouse);
 
+        // If the campaign option is set, prevent women from having their surname changed
+        if (campaign.getCampaignOptions().isNoNameChangeOnMarriage()) {
+            if (origin.getGender().isFemale() && !origin.getSurname().equals(origin.getMaidenName())) {
+                origin.setSurname(origin.getMaidenName());
+            }
+            if (spouse.getGender().isFemale() && !spouse.getSurname().equals(spouse.getMaidenName())) {
+                spouse.setSurname(spouse.getMaidenName());
+            }
+        }
+
         // Do the logging
         PersonalLogger.marriage(origin, spouse, today);
         PersonalLogger.marriage(spouse, origin, today);
