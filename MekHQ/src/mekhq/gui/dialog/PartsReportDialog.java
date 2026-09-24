@@ -62,6 +62,7 @@ import megamek.common.ui.FastJScrollPane;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Quartermaster;
+import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.market.PartsInUseManager;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
@@ -91,6 +92,7 @@ import mekhq.gui.sorter.TwoNumbersSorter;
 public class PartsReportDialog extends JDialog {
 
     private JCheckBox ignoreMothballedCheck, topUpWeeklyCheck;
+    private JSpinner sellExcessThresholdSpinner;
     private RoundedJButton topUpGMButton;
     private JComboBox<String> ignoreSparesUnderQualityCB;
     private JTable overviewPartsInUseTable;
@@ -384,6 +386,17 @@ public class PartsReportDialog extends JDialog {
         resetRequestedStockButton.setMargin(new Insets(10, 20, 10, 20));
         resetRequestedStockButton.addActionListener(evt -> resetRequestedStock());
 
+        RoundedJButton sellExcessButton = new RoundedJButton();
+        sellExcessButton.setText(resourceMap.getString("sellExcessBtn.text"));
+        sellExcessButton.setFocusPainted(false);
+        sellExcessButton.setMargin(new Insets(10, 20, 10, 20));
+        sellExcessButton.addActionListener(evt -> sellExcess());
+
+        sellExcessThresholdSpinner = new JSpinner(new SpinnerNumberModel(
+              (int) campaign.getSellExcessThreshold(), 0, 9999, 1));
+        sellExcessThresholdSpinner.setMaximumSize(sellExcessThresholdSpinner.getPreferredSize());
+        JLabel sellExcessLabel = new JLabel(resourceMap.getString("lblSellExcessThreshold.text"));
+
         boolean reverse = campaign.getCampaignOptions().isReverseQualityNames();
         String[] qualities = {
               " ", // Combo box is blank for first one because it accepts everything and is default
@@ -447,6 +460,9 @@ public class PartsReportDialog extends JDialog {
                                     .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED,
                                           GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                     .addComponent(resetRequestedStockButton)
+                                    .addComponent(sellExcessButton)
+                                    .addComponent(sellExcessLabel)
+                                    .addComponent(sellExcessThresholdSpinner)
                                     .addComponent(btnClose)
                                     .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED,
                                           GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -471,6 +487,9 @@ public class PartsReportDialog extends JDialog {
                                     .addComponent(topUpGMButton))
                     .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                     .addComponent(resetRequestedStockButton)
+                                    .addComponent(sellExcessButton)
+                                    .addComponent(sellExcessLabel)
+                                    .addComponent(sellExcessThresholdSpinner)
                                     .addComponent(btnClose))
         );
 
@@ -599,6 +618,32 @@ public class PartsReportDialog extends JDialog {
         updateOverviewPartsInUse();
     }
 
+    private void sellExcess() {
+        int confirm = JOptionPane.showConfirmDialog(this,
+              resourceMap.getString("sellExcessConfirm.text"),
+              resourceMap.getString("sellExcessConfirm.title"),
+              JOptionPane.YES_NO_OPTION);
+        if (confirm != JOptionPane.YES_OPTION) {
+            return;
+        }
+
+        commitTableEdits();
+        storePartInUseRequestedStockMap();
+
+        PartsInUseManager.SellSummary summary = partsInUseManager.sellExcessPartsInUse(
+              getPartsInUseFromTable(), campaign.getSellExcessThreshold());
+        updateOverviewPartsInUse();
+
+        if (summary.typesSold() > 0) {
+            String message = summary.typesSold() + " part type(s) sold for "
+                  + summary.totalValue().toAmountAndSymbolString();
+            campaign.addReport(DailyReportType.FINANCES, message);
+            JOptionPane.showMessageDialog(this, message,
+                  resourceMap.getString("sellExcessResult.title"),
+                  JOptionPane.INFORMATION_MESSAGE);
+        }
+    }
+
     public void storePartInUseRequestedStockMap() {
         if (overviewPartsInUseTable.isEditing()) {
             overviewPartsInUseTable.getCellEditor().stopCellEditing();
@@ -606,6 +651,7 @@ public class PartsReportDialog extends JDialog {
 
         campaign.setIgnoreMothballed(ignoreMothballedCheck.isSelected());
         campaign.setTopUpWeekly(topUpWeeklyCheck.isSelected());
+        campaign.setSellExcessThreshold(((Number) sellExcessThresholdSpinner.getValue()).doubleValue());
         if (ignoreSparesUnderQualityCB == null) {
             campaign.setIgnoreSparesUnderQuality(getMinimumQuality(" "));
         } else {
