@@ -91,6 +91,7 @@ public class RelationshipsTab {
     private JLabel lblCheckMutualAncestorsDepth;
     private JSpinner spnCheckMutualAncestorsDepth;
     private JCheckBox chkLogMarriageNameChanges;
+    private JCheckBox chkNoNameChangeOnMarriage;
 
     private JPanel pnlRandomMarriage;
     private JLabel lblRandomMarriageMethod;
@@ -248,6 +249,7 @@ public class RelationshipsTab {
         lblCheckMutualAncestorsDepth = new JLabel();
         spnCheckMutualAncestorsDepth = new JSpinner();
         chkLogMarriageNameChanges = new JCheckBox();
+        chkNoNameChangeOnMarriage = new JCheckBox();
 
         pnlRandomMarriage = new JPanel();
         comboRandomMarriageMethod = new MMComboBox<>("comboRandomMarriageMethod",
@@ -338,6 +340,9 @@ public class RelationshipsTab {
         chkLogMarriageNameChanges = new CampaignOptionsCheckBox("LogMarriageNameChanges");
         chkLogMarriageNameChanges.addMouseListener(createTipPanelUpdater(marriageHeader, "LogMarriageNameChanges"));
 
+        chkNoNameChangeOnMarriage = new CampaignOptionsCheckBox("NoNameChangeOnMarriage");
+        chkNoNameChangeOnMarriage.addMouseListener(createTipPanelUpdater(marriageHeader, "NoNameChangeOnMarriage"));
+
         // Layout the Panel
         final JPanel panel = new CampaignOptionsStandardPanel("MarriageGeneralOptionsPanel");
         final GridBagConstraints layout = new CampaignOptionsGridBagConstraints(panel);
@@ -362,6 +367,9 @@ public class RelationshipsTab {
         layout.gridx = 0;
         layout.gridy++;
         panel.add(chkLogMarriageNameChanges, layout);
+
+        layout.gridy++;
+        panel.add(chkNoNameChangeOnMarriage, layout);
 
         return panel;
     }
@@ -937,6 +945,7 @@ public class RelationshipsTab {
         chkUsePrisonerMarriages.setSelected(options.isUsePrisonerMarriages());
         spnCheckMutualAncestorsDepth.setValue(options.getCheckMutualAncestorsDepth());
         chkLogMarriageNameChanges.setSelected(options.isLogMarriageNameChanges());
+        chkNoNameChangeOnMarriage.setSelected(options.isNoNameChangeOnMarriage());
         comboRandomMarriageMethod.setSelectedItem(options.getRandomMarriageMethod());
         chkUseRandomClanPersonnelMarriages.setSelected(options.isUseRandomClanPersonnelMarriages());
         chkUseRandomPrisonerMarriages.setSelected(options.isUseRandomPrisonerMarriages());
@@ -998,6 +1007,7 @@ public class RelationshipsTab {
         options.setUsePrisonerMarriages(chkUsePrisonerMarriages.isSelected());
         options.setCheckMutualAncestorsDepth((int) spnCheckMutualAncestorsDepth.getValue());
         options.setLogMarriageNameChanges(chkLogMarriageNameChanges.isSelected());
+        options.setNoNameChangeOnMarriage(chkNoNameChangeOnMarriage.isSelected());
         options.setRandomMarriageMethod(comboRandomMarriageMethod.getSelectedItem());
         options.setUseRandomClanPersonnelMarriages(chkUseRandomClanPersonnelMarriages.isSelected());
         options.setUseRandomPrisonerMarriages(chkUseRandomPrisonerMarriages.isSelected());
