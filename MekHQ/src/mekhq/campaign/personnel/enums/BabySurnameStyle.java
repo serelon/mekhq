@@ -44,6 +44,8 @@ public enum BabySurnameStyle {
     // region Enum Declaration
     FATHERS("BabySurnameStyle.FATHERS.text", "BabySurnameStyle.FATHERS.toolTipText"),
     MOTHERS("BabySurnameStyle.MOTHERS.text", "BabySurnameStyle.MOTHERS.toolTipText"),
+    MOTHERS_DAUGHTERS_FATHERS_SONS("BabySurnameStyle.MOTHERS_DAUGHTERS_FATHERS_SONS.text",
+          "BabySurnameStyle.MOTHERS_DAUGHTERS_FATHERS_SONS.toolTipText"),
     MOTHERS_FATHERS("BabySurnameStyle.MOTHERS_FATHERS.text", "BabySurnameStyle.MOTHERS_FATHERS.toolTipText"),
     MOTHERS_HYPHEN_FATHERS("BabySurnameStyle.MOTHERS_HYPHEN_FATHERS.text",
           "BabySurnameStyle.MOTHERS_HYPHEN_FATHERS.toolTipText"),
@@ -127,6 +129,10 @@ public enum BabySurnameStyle {
         return this == ICELANDIC_COMBINATION_NYMICS;
     }
 
+    public boolean isMothersDaughtersFathersSons() {
+        return this == MOTHERS_DAUGHTERS_FATHERS_SONS;
+    }
+
     public boolean isRussianPatronymics() {
         return this == RUSSIAN_PATRONYMICS;
     }
@@ -173,6 +179,11 @@ public enum BabySurnameStyle {
                 if (hasFather) {
                     return father.getSurname() + '-' + mother.getSurname();
                 }
+            case MOTHERS_DAUGHTERS_FATHERS_SONS:
+                if (babyGender.isMale() && hasFather) {
+                    return father.getSurname();
+                }
+                return mother.getSurname();
             case FATHERS:
                 if (hasFather) {
                     return father.getSurname();
